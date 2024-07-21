@@ -5,14 +5,16 @@ import '../../domain/model/overview_results.dart';
 
 class OverviewTile extends StatelessWidget {
   final OverviewResults restaurant;
+  final bool isSelected;
 
-  const OverviewTile({super.key, required this.restaurant});
+  const OverviewTile(
+      {super.key, required this.restaurant, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(10),
-      elevation: 0.0,
+      elevation: isSelected ? 10.0 : 0.0,
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
