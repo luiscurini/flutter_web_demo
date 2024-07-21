@@ -77,7 +77,7 @@ class _DesktopOverviewState extends State<_DesktopOverview> {
         flex: 3,
         child: FlutterMap(
           options: const MapOptions(
-            initialCenter: LatLng(48.7665, 11.4258),
+            initialCenter: location,
             initialZoom: zoomDesktop,
           ),
           children: [
@@ -111,6 +111,12 @@ class _DesktopOverviewState extends State<_DesktopOverview> {
         ),
       ),
     ]);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
 
