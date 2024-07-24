@@ -1,5 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:indexed_list_view/indexed_list_view.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '../overview_view_model.dart';
@@ -22,26 +26,45 @@ class _DesktopOverview extends StatelessWidget {
     final viewModel = context.watch<OverviewViewModel>();
     final overviewResult = viewModel.overviewResult;
 
-    return IndexedListView.builder(
-        controller: IndexedScrollController(initialIndex: 0),
-        minItemCount: 0,
-        maxItemCount: overviewResult.length - 1,
-        itemBuilder: (context, index) {
-          final restaurant = overviewResult[index];
-          return OverviewTile(restaurant: restaurant);
-        });
-
-    // TODO Step #2
-    // Now that the list was loaded and shown. Use the library flutter_map to show a map
-    // on the right side of the list. The list should take 2/5 of the screen
-    // and the map the rest
-    // Map documentation https://docs.fleaflet.dev/
-    // As zoom and location use the values defined in the constants file.
-    // In the TitleLayer pass as tileProvider: CancellableNetworkTileProvider())
-    // to avoid issues with the logger
-    //
-    // After the map was loaded, show a marker in the map for all the
-    // restaurants.
+    return Row(children: [
+      Expanded(
+          flex: 2,
+          child: IndexedListView.builder(
+              controller: IndexedScrollController(initialIndex: 0),
+              minItemCount: 0,
+              maxItemCount: overviewResult.length - 1,
+              itemBuilder: (context, index) {
+                final restaurant = overviewResult[index];
+                return OverviewTile(restaurant: restaurant);
+              })),
+      Expanded(
+        flex: 3,
+        child: FlutterMap(
+          options: const MapOptions(
+            initialCenter: LatLng(48.7665, 11.4258),
+            initialZoom: 14.0,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.app',
+              tileProvider: CancellableNetworkTileProvider(),
+            ),
+            MarkerLayer(
+              markers: overviewResult.mapIndexed((index, element) {
+                return Marker(
+                  width: 40,
+                  height: 40,
+                  point: LatLng(element.latitude, element.longitude),
+                  child: Icon(Icons.location_on_outlined,
+                      color: Theme.of(context).colorScheme.secondary, size: 40),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    ]);
 
     // TODO Step #3
     // Once the markers are shown. It's time to add some interaction.
