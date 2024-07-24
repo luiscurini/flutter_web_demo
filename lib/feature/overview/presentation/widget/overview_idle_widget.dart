@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:indexed_list_view/indexed_list_view.dart';
 import 'package:provider/provider.dart';
 
 import '../overview_view_model.dart';
+import 'overview_tile.dart';
 
 class OverviewIdleWidget extends StatelessWidget {
   const OverviewIdleWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // TODO Step #1
-    // Show a list in the _DesktopOverview by using the library indexed_list_view
-    // See https://pub.dev/packages/indexed_list_view/example
-    // When creating the list, minItemCount and maxItemCount can be
-    // passed, so only the amount of restaurants are created.
-    //
-    // As an items, use the OverviewTile widget
     return const _DesktopOverview();
   }
 }
@@ -25,13 +20,16 @@ class _DesktopOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<OverviewViewModel>();
+    final overviewResult = viewModel.overviewResult;
 
-    return Center(
-        child: Text(
-      'Hello Flutter Web Demo, '
-      '${viewModel.overviewResult.length + 1} restaurants were loaded',
-      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-    ));
+    return IndexedListView.builder(
+        controller: IndexedScrollController(initialIndex: 0),
+        minItemCount: 0,
+        maxItemCount: overviewResult.length - 1,
+        itemBuilder: (context, index) {
+          final restaurant = overviewResult[index];
+          return OverviewTile(restaurant: restaurant);
+        });
 
     // TODO Step #2
     // Now that the list was loaded and shown. Use the library flutter_map to show a map
